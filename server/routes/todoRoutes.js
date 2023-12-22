@@ -2,17 +2,27 @@
 
 // require express
 const express = require('express');
+const { Pool } = require('pg');
 
 // initialize an express router
 const router = express.Router();
+
+const pool = new Pool({
+	user: 'postgres',
+	host: 'localhost',
+	database: 'todos',
+	password: process.env.DB_SECRET,
+	port: 5432
+});
 
 // create local storage array for the todos
 let todos = [{ id: 0, task: 'Wash dishes' }];
 
 // create a get handler to the path /todos that sends back the todos
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+		const { rows } = await pool.query('SELECT * FROM todos')
 	// send back todos in json format
-	res.json(todos);
+	res.json(rows);
 	console.log(`GET /todos`);
 });
 
